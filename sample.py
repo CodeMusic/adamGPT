@@ -1,10 +1,43 @@
 import random
 import sys 
+from datetime import datetime
 
 prompt = "."
 promptOutput = ""
 
 import random
+
+
+class ChatProcessor:
+    def __init__(self):
+        self.previous_timestamp = None
+
+    def process_line(self, line):
+        # Regular expression to match the chat log pattern
+        pattern = re.compile(r'\[(.*?)\] (.*?): (.*)')
+        match = pattern.match(line)
+        
+        if match:
+            timestamp_str, person, message = match.groups()
+            timestamp = datetime.strptime(timestamp_str, '%Y-%m-%d, %I:%M:%S %p')
+            formatted_time = timestamp.strftime('%b-%d-%Y, %I:%M:%S %p')
+
+            response_time = None
+            if self.previous_timestamp:
+                response_time = (timestamp - self.previous_timestamp).total_seconds()
+
+            self.previous_timestamp = timestamp
+            return timestamp_str, person, message, response_time
+        else:
+            return None, None, None, None
+
+def format_date(date_str):
+    # Parse the input date string
+    timestamp = datetime.strptime(date_str, '%Y-%m-%d, %I:%M:%S %p')
+    # Format the date into the desired format
+    formatted_time = timestamp.strftime('%Y-%m-%d, %I:%M:%S %p')
+    return formatted_time
+
 def get_emotion_tag():
     # random number with 5 posbilities which will map to ~NEUTRAL~, ~MAD~, ~SAD~, ~AFRAID~, or ~GLAD~
     random_number = random.randint(0, 4)
@@ -19,6 +52,12 @@ def askCodeMusai(question = '.', system_message = '.', temperature = 0.9, useTok
     prompt = question + "\n" + mood + "\n" #force specific prompt
     promptOutput = f"Mood: {mood.replace('~', '').strip().title()}\nPrompt: {question}\n"
     return main(mood)
+
+
+chat_processor = ChatProcessor()
+
+
+  ##timestamp_str, person, message, response_time = chat_processor.process_line(line)
 
 def main(inMood = ""):
     global prompt, promptOutput
@@ -44,7 +83,9 @@ def main(inMood = ""):
     #if prompt.startswith('.'):
     #    prompt = get_emotion_tag()
     #elif (inMood != ""):
-    prompt = inMood
+
+
+    prompt =  inMood
 
     start = prompt # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
     num_samples = 1 # number of samples to draw
@@ -112,11 +153,12 @@ def main(inMood = ""):
         with open(start[5:], 'r', encoding='utf-8') as f:
             start = f.read()
     start_ids = encode(start)
+    userMsg = f"[{format_date(datetime.now().strftime('%Y-%m-%d, %I:%M:%S %p'))}] Zoe :{prompt}"
     x = (torch.tensor(start_ids, dtype=torch.long, device=device)[None, ...])
  
     
-    print(f"start: {start}")
-    print(f"start_ids: {start_ids}") 
+    #print(f"start: {start}")
+    #print(f"start_ids: {start_ids}") 
 
     stopIdx = encode('~')[0]
     print('\n---------------\n')

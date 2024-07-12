@@ -15,7 +15,8 @@ $ torchrun --nproc_per_node=8 --nnodes=2 --node_rank=0 --master_addr=123.456.123
 $ torchrun --nproc_per_node=8 --nnodes=2 --node_rank=1 --master_addr=123.456.123.456 --master_port=1234 train.py
 (If your cluster does not have Infiniband interconnect prepend NCCL_IB_DISABLE=1)
 """
-
+import datetime
+import re
 import os
 import time
 import signal
@@ -43,7 +44,7 @@ log_interval = 1
 eval_iters = 200
 eval_only = False # if True, script exits right after the first eval
 always_save_checkpoint = True # if True, always save a checkpoint after each eval
-init_from = 'resume' # 'resume' or 'scratch' or 'gpt2*'
+init_from = 'scratch' # 'resume' or 'scratch' or 'gpt2*'
 
 useChar = False
 
@@ -60,7 +61,7 @@ else:
 
 gradient_accumulation_steps = 5 * 8 # used to simulate larger batch sizes
 batch_size = 12 # if gradient_accumulation_steps > 1, this is the micro-batch size
-block_size = 16
+block_size = 64
 # model
 n_layer = 8
 n_head = 8

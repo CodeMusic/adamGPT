@@ -335,6 +335,8 @@ class GPT(nn.Module):
                 started = True
 
             print(out, end='', flush=True)
+            if out.isdigit():
+                print('\n')
             if stopIdx is not None and idx_next == stopIdx:
                 break
             
