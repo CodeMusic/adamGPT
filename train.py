@@ -44,7 +44,7 @@ log_interval = 1
 eval_iters = 200
 eval_only = False # if True, script exits right after the first eval
 always_save_checkpoint = True # if True, always save a checkpoint after each eval
-init_from = 'scratch' # 'resume' or 'scratch' or 'gpt2*'
+init_from = 'resume' # 'resume' or 'scratch' or 'gpt2*'
 
 useChar = False
 
