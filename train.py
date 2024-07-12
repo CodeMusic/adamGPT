@@ -157,6 +157,121 @@ def get_lr(it):
     coeff = 0.5 * (1.0 + math.cos(math.pi * decay_ratio)) # coeff ranges 0..1
     return min_lr + coeff * (learning_rate - min_lr)
 
+import random
+from datetime import datetime
+
+def get_current_time():
+    now = datetime.now()
+    formatted_time = now.strftime("%Y-%m-%d, %I:%M:%S %p")
+    return formatted_time
+
+def get_conversation_starter():
+    conversation_starters = [
+        "What's the most interesting thing you've read or seen this week?",
+        "If you could have dinner with any historical figure, who would it be and why?",
+        "What's a skill you wish you had?",
+        "What's your favorite book or movie and why?",
+        "If you could travel anywhere in the world, where would you go?",
+        "What's the best piece of advice you've ever received?",
+        "What's your favorite way to spend a weekend?",
+        "If you could instantly become an expert in something, what would it be?",
+        "What's your favorite hobby or pastime?",
+        "What's the most memorable trip you've ever taken?",
+        "If you could have any superpower, what would it be and why?",
+        "What's your favorite type of music or band?",
+        "What's the most unusual food you've ever tried?",
+        "If you could live in any time period, when would it be and why?",
+        "What's your favorite holiday and how do you celebrate it?",
+        "What's the most challenging thing you've ever done?",
+        "If you could meet any fictional character, who would it be and why?",
+        "What's your favorite way to relax after a long day?",
+        "What's the best gift you've ever received?",
+        "If you could learn any language, which one would you choose and why?",
+        "What's your favorite outdoor activity?",
+        "What's the most interesting place you've ever visited?",
+        "If you could have any job for a day, what would it be?",
+        "What's your favorite type of cuisine?",
+        "What's the most important lesson you've learned in life?",
+        "If you could have a conversation with your future self, what would you ask?",
+        "What's your favorite childhood memory?",
+        "If you could change one thing about the world, what would it be?",
+        "What's your favorite way to stay active?",
+        "What's the most inspiring book or movie you've ever encountered?",
+        "If you could have any animal as a pet, what would it be and why?",
+        "What's your favorite way to spend time with friends or family?",
+        "What's the most interesting fact you know?",
+        "If you could switch lives with someone for a day, who would it be and why?",
+        "What's your favorite type of art or artist?",
+        "What's the most adventurous thing you've ever done?",
+        "If you could create a new holiday, what would it be and how would you celebrate?",
+        "What's your favorite type of weather and why?",
+        "What's the most important quality you look for in a friend?",
+        "If you could have any talent, what would it be and why?",
+        "What's your favorite way to give back to the community?",
+        "What's the most interesting documentary you've ever watched?",
+        "If you could have a conversation with any celebrity, who would it be and why?",
+        "What's your favorite type of dessert?",
+        "What's the most important goal you're working towards right now?",
+        "If you could visit any fictional world, where would you go?",
+        "What's your favorite way to unwind after a stressful day?",
+        "What's the most interesting project you've ever worked on?",
+        "If you could have any piece of technology from the future, what would it be?",
+        "What's your favorite type of exercise?",
+        "What's the most important value you live by?",
+        "If you could have any job in the world, what would it be and why?",
+        "What's your favorite way to spend a rainy day?",
+        "What's the most interesting thing you've learned recently?",
+        "If you could have any car, what would it be and why?",
+        "What's your favorite type of game or sport?",
+        "What's the most important thing you've accomplished so far?",
+        "If you could have any piece of art in your home, what would it be?",
+        "What's your favorite way to celebrate a special occasion?",
+        "What's the most interesting place you've ever lived?",
+        "If you could have any type of home, what would it be and why?",
+        "What's your favorite way to stay motivated?",
+        "What's the most important thing you want to achieve in the next year?",
+        "If you could have any type of garden, what would it be and why?",
+        "What's your favorite way to spend a summer day?",
+        "What's the most interesting thing you've ever built or created?",
+        "If you could have any type of vacation, what would it be and why?",
+        "What's your favorite way to stay organized?",
+        "What's the most important thing you've learned from a mistake?",
+        "If you could have any type of workspace, what would it be and why?",
+        "What's your favorite way to stay connected with loved ones?",
+        "What's the most interesting thing you've ever collected?",
+        "If you could have any type of celebration, what would it be and why?",
+        "What's your favorite way to stay healthy?",
+        "What's the most important thing you've learned from a mentor?",
+        "If you could have any type of adventure, what would it be and why?",
+        "What's your favorite way to stay creative?",
+        "What's the most interesting thing you've ever discovered?",
+        "If you could have any type of event, what would it be and why?",
+        "What's your favorite way to stay inspired?",
+        "What's the most important thing you've learned from a challenge?",
+        "If you could have any type of experience, what would it be and why?",
+        "What's your favorite way to stay positive?",
+        "What's the most interesting thing you've ever researched?",
+        "If you could have any type of collection, what would it be and why?",
+        "What's your favorite way to stay productive?",
+        "What's the most important thing you've learned from a success?",
+        "If you could have any type of lifestyle, what would it be and why?",
+        "What's your favorite way to stay entertained?",
+        "What's the most interesting thing you've ever written?",
+        "If you could have any type of hobby, what would it be and why?",
+        "What's your favorite way to stay informed?",
+        "What's the most important thing you've learned from a failure?",
+        "If you could have any type of relationship, what would it be and why?",
+        "What's your favorite way to stay balanced?",
+        "What's the most interesting thing you've ever taught?",
+        "If you could have any type of skill, what would it be and why?",
+        "What's your favorite way to stay grounded?",
+        "What's the most important thing you've learned from a friend?",
+        "If you could have any type of influence, what would it be and why?",
+        "What's your favorite way to stay adventurous?",
+        "What's the most interesting thing you've ever experienced?",
+        "If you could have any type of legacy, what would it be and why?"
+    ]
+    return random.choice(conversation_starters)
 
 if __name__ == '__main__':
     # if not ddp, we are running on a single gpu, and one process
@@ -322,9 +437,12 @@ if __name__ == '__main__':
                     print(f"\nCodeMusAI, estimated age: {years} years and {months} months \ncognitive training discrepancy: {cognitiveDescrepancies['train']:.4f}, \ncognitive validation discrepancy: {cognitiveDescrepancies['val']:.4f}\n")
                     print("================================");
                     print(f"====Sample Output of Model ====")
-                    callAskCodeMusai(f"You are {iter_num} cycles old, and are amazing!.")
+                    message  = f"[{get_current_time()}] Zoe: [{get_conversation_starter()}]"
+                    callAskCodeMusai( message)
                     print("\n================================");
                     print("~~~~~~~~~-~~~~~~~~~~~\n");
+        
+
 
         if iter_num == 0 and eval_only:
             break

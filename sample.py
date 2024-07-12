@@ -1,6 +1,7 @@
 import random
 import sys 
 from datetime import datetime
+import re
 
 prompt = "."
 promptOutput = ""
@@ -59,7 +60,7 @@ chat_processor = ChatProcessor()
 
   ##timestamp_str, person, message, response_time = chat_processor.process_line(line)
 
-def main(inMood = ""):
+def main(inMood = "", message = ""):
     global prompt, promptOutput
     """
     Sample from a trained model
@@ -85,7 +86,7 @@ def main(inMood = ""):
     #elif (inMood != ""):
 
 
-    prompt =  inMood
+    prompt =  f"{message} [ANALYSIS:{inMood}]"
 
     start = prompt # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
     num_samples = 1 # number of samples to draw
@@ -156,20 +157,22 @@ def main(inMood = ""):
         encode = lambda s: enc.encode(s, allowed_special={"<|endoftext|>"})
         decode = lambda l: enc.decode(l)
 
+    start = f"[{format_date(datetime.now().strftime('%Y-%m-%d, %I:%M:%S %p'))}] Zoe :{prompt}"
     # encode the beginning of the prompt
     if start.startswith('FILE:'):
         with open(start[5:], 'r', encoding='utf-8') as f:
             start = f.read()
+    print(f"start: {start}")
     
     start_ids = encode(start)
-    userMsg = f"[{format_date(datetime.now().strftime('%Y-%m-%d, %I:%M:%S %p'))}] Zoe :{prompt}"
+    x = '['
     x = (torch.tensor(start_ids, dtype=torch.long, device=device)[None, ...])
  
     
     #print(f"start: {start}")
     #print(f"start_ids: {start_ids}") 
 
-    stopIdx = encode('~')[0]
+    stopIdx = encode('[')[0]
     print('\n---------------\n')
 
     temperature = 0.05
