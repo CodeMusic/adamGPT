@@ -109,9 +109,9 @@ def main(inMood = ""):
 
     if init_from == 'resume':
         # init from a model saved in a specific directory
-        ckpt_path = os.path.join(out_dir, 'ckpt.pt')
-        if not os.path.exists(ckpt_path):
-            print(f"Error: {ckpt_path} does not exist, starting from scratch")
+
+        if not os.path.exists(os.path.join(out_dir, 'ckpt.pt')):
+            print(f"Error: {out_dir} does not exist, starting from scratch")
             init_from = 'scratch'
 
     # model

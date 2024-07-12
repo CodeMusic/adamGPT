@@ -1,3 +1,6 @@
 
 /__pycache__
 .DS_Store
+.env
+trainedModelOut_char/ckpt.pt
+trainedModelOut_token/ckpt.pt
