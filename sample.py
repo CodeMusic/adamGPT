@@ -42,13 +42,13 @@ def format_date(date_str):
 def get_emotion_tag():
     # random number with 5 posbilities which will map to ~NEUTRAL~, ~MAD~, ~SAD~, ~AFRAID~, or ~GLAD~
     random_number = random.randint(0, 4)
-    emotion_tags = ['NEUTRAL', 'MAD', 'SAD', 'AFRAID', 'GLAD']
+    emotion_tags = ['NEUTRAL', 'MAD', 'SAD', 'AFRAID', 'GLAD', 'RESONANCE']
     return f"~{emotion_tags[random_number]}~"
 
 def askCodeMusai(question = '.', system_message = '.', temperature = 0.9, useTokenEmbedding= True):
     global prompt, promptOutput
     prompt = question
-    mood = get_emotion_tag()
+    mood = theEmotion
     #if (prompt.startswith('.')):
     prompt = question + "\n" + mood + "\n" #force specific prompt
     promptOutput = f"Mood: {mood.replace('~', '').strip().title()}\nPrompt: {question}\n"
@@ -57,10 +57,17 @@ def askCodeMusai(question = '.', system_message = '.', temperature = 0.9, useTok
 
 chat_processor = ChatProcessor()
 
-
+theEmotion = get_emotion_tag()
   ##timestamp_str, person, message, response_time = chat_processor.process_line(line)
 
-def main(inMood = "", message = ""):
+
+def interpretMoodShift(andEmotion):
+    global theEmotion
+    theEmotion = andEmotion
+
+
+
+def main(inMood = "", message = "", stopCondition = ""):
     global prompt, promptOutput
     """
     Sample from a trained model
@@ -86,13 +93,15 @@ def main(inMood = "", message = ""):
     #elif (inMood != ""):
 
 
+
+
     prompt =  f"{message} [ANALYSIS:{inMood}]"
 
     start = prompt # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
-    num_samples = 1 # number of samples to draw
-    max_new_tokens = 100 # number of tokens generated in each sample
+    num_samples = 8 # number of samples to draw
+    max_new_tokens = 300 # number of tokens generated in each sample
     temperature = 1.19 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
-    top_k = 300 # retain only the top_k most likely tokens, clamp others to have 0 probability
+    top_k = 150 # retain only the top_k most likely tokens, clamp others to have 0 probability
     #seed = 1337
     device = 'mps' # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1', etc.
     dtype = 'bfloat16' if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else 'float16' # 'float32' or 'bfloat16' or 'float16'
@@ -174,7 +183,7 @@ def main(inMood = "", message = ""):
 
     stopIdx = encode('[')[0]
     print('\n---------------\n')
-
+    interpretMoodShift(andEmotion)
     temperature = 0.05
     tempIncrement = 0.05
     incrementTemp = True
@@ -185,9 +194,11 @@ def main(inMood = "", message = ""):
             for k in range(num_samples):
 
                 if (randomTemp):
-                    temperature = random.uniform(0.01, 0.9)
+                    temperature = random.uniform(0.01, 2.9)
                     if (random.randint(0, 100) == 50):
-                        temperature = 3
+                        temperature = 5
+                    elif (random.randint(0, 100) == 50):
+                        temperature = 0.01
                     elif (random.randint(0, 100) < 50):
                         temperature = random.uniform(0.01, 0.9)
                     else:
@@ -221,10 +232,12 @@ if __name__ == "__main__":
     #I want to be able to pass in a mood as a command line argument and have it passed to the main function
     #I can do this by adding a new argument to the command line
     #I can do this by adding a new argument to the command line
+    stopCondition : str = "Chris"
+    stopBuffer : int = 25 #chars atfer trigger
 
     args = sys.argv[1:]
     if (len(args) > 0):
         print(f"args: {args[0]}")
-        main("~" + args[0] + "~")
+        main("~" + args[0] + "~", stopCondition, stopBuffer)
     else:
-        main()
+        main("]", stopCondition, stopBuffer)
