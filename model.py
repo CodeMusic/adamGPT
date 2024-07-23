@@ -303,12 +303,25 @@ class GPT(nn.Module):
         return mfu
 
     @torch.no_grad()
-    def generate(self, idx, max_new_tokens, decode, temperature=1.0, top_k=None, stopIdx=None):
+    def generate(self, idx, max_new_tokens, decode, temperature=1.0, top_k=None, stopIdx=None, speaker=None, noBreak = False):
         """
         Take a conditioning sequence of indices idx (LongTensor of shape (b,t)) and complete
         the sequence max_new_tokens times, feeding the predictions back into the model each time.
         Most likely you'll want to make sure to be in model.eval() mode of operation for this.
         """
+
+        theSpeaker = speaker
+        if theSpeaker is "Zoe":
+            theResponder = "Adam"
+        elif theSpeaker is "Adam":
+            theResponder = "Zoe"
+
+        theSpeaker = theSpeaker + ": "
+        theResponder = theResponder + ": "
+
+
+
+
         started = False
         for _ in range(max_new_tokens):
             # if the sequence context is growing too long we must crop it at block_size
@@ -336,12 +349,9 @@ class GPT(nn.Module):
 
             print(out, end='', flush=True)
 
-            if  (out == ":" or
-                out == "." or
-                out == "]" or
-                out == "[ANALYSIS:"):
+            if  (out == "]"):
                 print('\n')
-            if stopIdx is not None and idx_next == stopIdx:
+            if stopIdx is not None and idx_next == stopIdx and theResponder in out and not noBreak:
                 break
             
         return idx

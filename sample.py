@@ -45,14 +45,16 @@ def get_emotion_tag():
     emotion_tags = ['NEUTRAL', 'MAD', 'SAD', 'AFRAID', 'GLAD']
     return f"~{emotion_tags[random_number]}~"
 
-def askCodeMusai(question = '.', system_message = '.', temperature = 0.9, useTokenEmbedding= True):
+def askCodeMusai(question = '.', system_message = '.', temperature = None, useTokenEmbedding= True):
     global prompt, promptOutput
-    prompt = question
+    prompt = f"({system_message})" + question
     mood = get_emotion_tag()
-    #if (prompt.startswith('.')):
-    prompt = question + "\n" + mood + "\n" #force specific prompt
-    promptOutput = f"Mood: {mood.replace('~', '').strip().title()}\nPrompt: {question}\n"
-    return main(mood)
+
+    promptOutput = f"Mood: {mood.replace('~', '').strip().title()}\{person}: {prompt}\n\n"
+    print(f"{promptOutput}")
+
+    person = "Zoe" if random.randint(0, 1) == 0 else "Adam"
+    return main(mood, person, message, temperature)
 
 
 chat_processor = ChatProcessor()
@@ -60,8 +62,7 @@ chat_processor = ChatProcessor()
 
   ##timestamp_str, person, message, response_time = chat_processor.process_line(line)
 
-def main(inMood = "", message = ""):
-    global prompt, promptOutput
+def main(inMood = "", person = "", message = "", temperature = None):
     """
     Sample from a trained model
     """
@@ -85,13 +86,13 @@ def main(inMood = "", message = ""):
     #    prompt = get_emotion_tag()
     #elif (inMood != ""):
 
-
-    prompt =  f"{message} [ANALYSIS:{inMood}]"
+    prompt =  f"{inMood}\n[{datetime.now().strftime('%Y-%m-%d, %I:%M:%S��%p')}]\n\n{person}: {message}"
 
     start = prompt # or "<|endoftext|>" or etc. Can also specify a file, use as: "FILE:prompt.txt"
-    num_samples = 1 # number of samples to draw
-    max_new_tokens = 100 # number of tokens generated in each sample
-    temperature = 1.19 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
+    num_samples = 4 # number of samples to draw
+    max_new_tokens = 500 # number of tokens generated in each sample
+    if temperature is None:
+        temperature = 1.19 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
     top_k = 300 # retain only the top_k most likely tokens, clamp others to have 0 probability
     #seed = 1337
     device = 'mps' # examples: 'cpu', 'cuda', 'cuda:0', 'cuda:1', etc.
@@ -175,10 +176,15 @@ def main(inMood = "", message = ""):
     stopIdx = encode('[')[0]
     print('\n---------------\n')
 
-    temperature = 0.05
+
     tempIncrement = 0.05
-    incrementTemp = True
-    randomTemp = True
+    incrementTemp = False
+    randomTemp = False
+
+    if temperature is None:
+        temperature = 0.05
+        incrementTemp = True
+        randomTemp = True
     # run generation
     with torch.no_grad():
         with ctx:
@@ -206,8 +212,8 @@ def main(inMood = "", message = ""):
                 print(f"{promptOutput}")
                 print("-----------------")
                 print(f"{prompt}")
-                y = model.generate(x, max_new_tokens, decode=decode, temperature=temperature, top_k=top_k, stopIdx=stopIdx)
-                out = decode(y[0].tolist()).replace('\n', '').replace('.', '') + '.'
+                y = model.generate(x, max_new_tokens, decode=decode, temperature=temperature, top_k=top_k, stopIdx=stopIdx, speaker='Zoe')
+                out = decode(y[0].tolist()) + ']' #.replace('\n', '').replace('.', '') + '.'
                 thoughtVariabilityText = f"({temperature:.2f})"
                 print(f"                   {thoughtVariabilityText}")
                 #print(out.strip())
@@ -223,8 +229,33 @@ if __name__ == "__main__":
     #I can do this by adding a new argument to the command line
 
     args = sys.argv[1:]
+    mood = "SAD"
+    person = "Zoe"
+    message = "Chris"
+    temperature = None
+
+    try:
+        mood = args[0]
+        person = args[1]
+        message = args[2]
+        temperature = args[3]
+    except:
+        pass
+
+    if mood is None:
+        mood = "GLAD"
+
+    if person is None:
+        person = "Zoe"
+
+    if message is None:
+        message = "Hello"
+
+    if temperature is None:
+        temperature = 1.19 # 1.0 = no change, < 1.0 = less random, > 1.0 = more random, in predictions
+
     if (len(args) > 0):
         print(f"args: {args[0]}")
-        main("~" + args[0] + "~")
+        main("~" + mood + "~", person, message, temperature)
     else:
         main()
