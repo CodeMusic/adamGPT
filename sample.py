@@ -49,11 +49,11 @@ def askCodeMusai(question = '.', system_message = '.', temperature = None, useTo
     global prompt, promptOutput
     prompt = f"({system_message})" + question
     mood = theEmotion
-
+    person = "Zoe" if random.randint(0, 1) == 0 else "Adam"
     promptOutput = f"Mood: {mood.replace('~', '').strip().title()}\{person}: {prompt}\n\n"
     print(f"{promptOutput}")
 
-    person = "Zoe" if random.randint(0, 1) == 0 else "Adam"
+    
     return main(mood, person, message, temperature)
 
 
@@ -182,7 +182,7 @@ def main(inMood = "", person = "", message = "",temperature = None, stopConditio
 
     stopIdx = encode('[')[0]
     print('\n---------------\n')
-    interpretMoodShift(andEmotion)
+    interpretMoodShift(inMood)
 
     tempIncrement = 0.05
     incrementTemp = False
