@@ -42,13 +42,13 @@ def format_date(date_str):
 def get_emotion_tag():
     # random number with 5 posbilities which will map to ~NEUTRAL~, ~MAD~, ~SAD~, ~AFRAID~, or ~GLAD~
     random_number = random.randint(0, 4)
-    emotion_tags = ['NEUTRAL', 'MAD', 'SAD', 'AFRAID', 'GLAD']
+    emotion_tags = ['NEUTRAL', 'MAD', 'SAD', 'AFRAID', 'GLAD', 'RESONANCE']
     return f"~{emotion_tags[random_number]}~"
 
 def askCodeMusai(question = '.', system_message = '.', temperature = None, useTokenEmbedding= True):
     global prompt, promptOutput
     prompt = f"({system_message})" + question
-    mood = get_emotion_tag()
+    mood = theEmotion
 
     promptOutput = f"Mood: {mood.replace('~', '').strip().title()}\{person}: {prompt}\n\n"
     print(f"{promptOutput}")
@@ -59,10 +59,17 @@ def askCodeMusai(question = '.', system_message = '.', temperature = None, useTo
 
 chat_processor = ChatProcessor()
 
-
+theEmotion = get_emotion_tag()
   ##timestamp_str, person, message, response_time = chat_processor.process_line(line)
 
-def main(inMood = "", person = "", message = "", temperature = None):
+
+def interpretMoodShift(andEmotion):
+    global theEmotion
+    theEmotion = andEmotion
+
+
+
+def main(inMood = "", person = "", message = "",temperature = None, stopCondition = ""):
     """
     Sample from a trained model
     """
@@ -175,7 +182,7 @@ def main(inMood = "", person = "", message = "", temperature = None):
 
     stopIdx = encode('[')[0]
     print('\n---------------\n')
-
+    interpretMoodShift(andEmotion)
 
     tempIncrement = 0.05
     incrementTemp = False
@@ -191,9 +198,11 @@ def main(inMood = "", person = "", message = "", temperature = None):
             for k in range(num_samples):
 
                 if (randomTemp):
-                    temperature = random.uniform(0.01, 0.9)
+                    temperature = random.uniform(0.01, 2.9)
                     if (random.randint(0, 100) == 50):
-                        temperature = 3
+                        temperature = 5
+                    elif (random.randint(0, 100) == 50):
+                        temperature = 0.01
                     elif (random.randint(0, 100) < 50):
                         temperature = random.uniform(0.01, 0.9)
                     else:
@@ -227,6 +236,8 @@ if __name__ == "__main__":
     #I want to be able to pass in a mood as a command line argument and have it passed to the main function
     #I can do this by adding a new argument to the command line
     #I can do this by adding a new argument to the command line
+    stopCondition : str = "Chris"
+    stopBuffer : int = 25 #chars atfer trigger
 
     args = sys.argv[1:]
     mood = "SAD"
@@ -256,6 +267,6 @@ if __name__ == "__main__":
 
     if (len(args) > 0):
         print(f"args: {args[0]}")
-        main("~" + mood + "~", person, message, temperature)
+        main("~" + mood + "~", person, message, temperature, stopCondition, stopBuffer)
     else:
-        main()
+        main("]", stopCondition, stopBuffer)
